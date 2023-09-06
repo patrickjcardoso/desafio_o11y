@@ -1,6 +1,5 @@
-from flask import Flask, request
+from flask import Flask, request, Response
 from prometheus_client import Counter, Histogram, generate_latest, REGISTRY
-from prometheus_client.exposition import MetricsHandler
 import time
 
 app = Flask(__name__)
@@ -81,10 +80,11 @@ def calculate_duration():
     function_duration.labels(function_name='calculate_duration').observe(time.time() - start_time)
     return "Tempo de execução medido com sucesso"
 
-# Rota para expor métricas do Prometheus
+# Rota para expor métricas do Prometheus com quebras de linha
 @app.route('/metrics')
 def metrics():
-    return generate_latest(REGISTRY)
+    metrics_data = generate_latest(REGISTRY)
+    return Response(metrics_data, content_type='text/plain; version=0.0.4')
 
 # Rota para mostrar métricas no formato prometheus
 @app.route('/metrics-text')

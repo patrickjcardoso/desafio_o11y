@@ -41,36 +41,38 @@ Criar um ambiente de observabilidade usando Prometheus e Grafana para monitorar 
 
 
 ```yaml
-    version: '3'
-    services:
-    prometheus:
-        image: prom/prometheus
-        volumes:
-        - ./prometheus:/etc/prometheus
-        command:
-        - '--config.file=/etc/prometheus/prometheus.yml'
-        ports:
-        - '9090:9090'
+version: '3'
+services:
+  prometheus:
+    image: prom/prometheus
+    volumes:
+    - ./prometheus:/etc/prometheus
+    command:
+    - '--config.file=/etc/prometheus/prometheus.yml'
+    ports:
+      - '9090:9090'
+    network_mode: "host"
 
-    grafana:
-        image: grafana/grafana
-        ports:
-        - '3000:3000'
+  grafana:
+    image: grafana/grafana
+    ports:
+    - '3000:3000'
+    network_mode: "host"
 ```
 
 1.4. Crie um diretório chamado **prometheus** e, dentro dele, crie um arquivo **prometheus.yml** para configurar o Prometheus:
 
   ```yaml
-    global:
-    scrape_interval:     15s
+global:
+  scrape_interval: 15s
 
-    scrape_configs:
-    - job_name: 'prometheus'
-        static_configs:
-        - targets: ['localhost:9090']
-    - job_name: 'your-app'
-        static_configs:
-        - targets: ['your-app-container:your-app-port']
+scrape_configs:
+- job_name: 'prometheus'
+  static_configs:
+    - targets: ['localhost:9090']
+- job_name: 'your-app'
+  static_configs:
+    - targets: ['your-app-container:your-app-port']
   ```
 
 ### Passo 2: Configurando a Aplicação de Exemplo
@@ -110,6 +112,8 @@ No arquivo **prometheus.yml** no diretório prometheus (conforme configurado ant
 
 * Certifique-se de substituir **'your-app-container:your-app-port'** pelo host e porta onde sua aplicação python está sendo executada.
 
+![Alt text](image.png)
+
 ### Passo 4: Iniciando o Ambiente de Observabilidade
 
 4.1 Volte para o diretório raiz do seu projeto e execute o seguinte comando para iniciar os serviços Prometheus e Grafana:
@@ -130,3 +134,36 @@ $ docker-compose ps
 5.1 Acesse o painel Promethues em seu navegador em http://localhost:9090.
 
 5.2 Verifique so o Prometheus está conseguindo acessar os dados da sua aplicação. 
+
+* Clique no menu **Status** e depois em **Targets**.
+
+  * O status deve estar UP para ambos os targets (Prometheus e your-app)
+  * Caso o status da aplicação não esteja UP, certifique-se que a aplicação esteja rodando (Item 2.3).
+  * Caso ainda não esteja UP ou com outro status, reveja a atividade, pois algum ponto pode ter faltado.
+
+5.3 Agora vamos olhar as métricas configuradas em nossa aplicação:
+
+* Métrica de Contagem de Erros (app_errors_total): Esta métrica conta o número total de erros que ocorreram em sua aplicação.
+* Métrica de Duração da Função (app_function_duration_seconds): Esta métrica mede o tempo gasto na execução de funções específicas em sua aplicação. Você configurou rótulos para identificar a função específica sendo monitorada.
+
+### Passo 6: Configurando o Grafana
+
+6.1. Acesse o painel Grafana em seu navegador em http://localhost:3000.
+
+6.2. Faça login com as credenciais padrão (username: admin, password: admin).
+
+6.3. Configure o Prometheus como uma fonte de dados:
+
+* Clique em "Configuration" no menu à esquerda.
+* Clique em "Data Sources" e, em seguida, em "Add data source".
+* Escolha "Prometheus" como o tipo de fonte de dados.
+* Na seção "HTTP", configure o URL para http://prometheus:9090.
+* Clique em "Save & Test".
+
+### Passo 7: Criando um Painel no Grafana
+
+6.1. Crie um novo painel clicando em "Create" e escolha "Dashboard".
+
+6.2. Clique em "Add new panel" e escolha "Graph".
+
+6.3. Configure sua consulta Prometheus para visualizar métricas da sua aplicação.
