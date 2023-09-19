@@ -32,10 +32,9 @@ Criar um ambiente de observabilidade usando Prometheus e Grafana para monitorar 
    ```
   
     
-1.2. Clone o repositório ou crie um diretório para o seu projeto e vá para ele:
+1.2. **Clone o repositório** e acesse o diretório do laboratório:
 
-    $ mkdir observability-lab
-    $ cd observability-lab
+    $ cd desafio_o11y/observability-lab
 
 1.3. Crie um arquivo **docker-compose.yml** para definir os serviços Prometheus e Grafana:
 
@@ -46,7 +45,7 @@ services:
   prometheus:
     image: prom/prometheus
     volumes:
-    - ./prometheus:/etc/prometheus
+    - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     command:
     - '--config.file=/etc/prometheus/prometheus.yml'
     ports:
@@ -75,6 +74,8 @@ scrape_configs:
     - targets: ['your-app-container:your-app-port']
   ```
 
+* **Dica:** Você precisará ajustar a identação do arquivo
+
 ### Passo 2: Configurando a Aplicação de Exemplo
 
 2.1 Certifique-se de que você tenha o **Flask** e o **Prometheus Client** Python instalados. Você pode instalá-los usando o pip:
@@ -99,7 +100,11 @@ python app.py
 
 Sua aplicação estará disponível em http://localhost:3001. Você pode acessar a página inicial e também verificar as métricas expostas em http://localhost:3001/metrics.
 
-### Passo 3: Configurar o Prometheus no Laboratório 
+### Passo 3: Gerando métricas na aplicação
+
+Acesse sua aplicação em clique em: Gerar Erro e depois em Calcular Duração
+
+### Passo 4: Configurar o Prometheus no Laboratório 
 
 No arquivo **prometheus.yml** no diretório prometheus (conforme configurado anteriormente), adicione ou ajuste a seguinte seção sob **scrape_configs** para coletar métricas da sua aplicação python:
 
@@ -114,26 +119,26 @@ No arquivo **prometheus.yml** no diretório prometheus (conforme configurado ant
 
 ![Alt text](image.png)
 
-### Passo 4: Iniciando o Ambiente de Observabilidade
+### Passo 5: Iniciando o Ambiente de Observabilidade
 
-4.1 Volte para o diretório raiz do seu projeto e execute o seguinte comando para iniciar os serviços Prometheus e Grafana:
+5.1 Volte para o diretório raiz do seu projeto e execute o seguinte comando para iniciar os serviços Prometheus e Grafana:
 
 ```console
 $ cd ..
 $ docker-compose up -d
 ```
 
-4.2 Certifique-se que os containers do Prometheus e do Grafana subiram e estão funcionando:
+5.2 Certifique-se que os containers do Prometheus e do Grafana subiram e estão funcionando:
 
 ```console
 $ docker-compose ps
 ```
 
-### Passo 5: Acessando o Promethues e verificando as métricas da aplicação
+### Passo 6: Acessando o Promethues e verificando as métricas da aplicação
 
-5.1 Acesse o painel Promethues em seu navegador em http://localhost:9090.
+6.1 Acesse o painel Promethues em seu navegador em http://localhost:9090.
 
-5.2 Verifique so o Prometheus está conseguindo acessar os dados da sua aplicação. 
+6.2 Verifique so o Prometheus está conseguindo acessar os dados da sua aplicação. 
 
 * Clique no menu **Status** e depois em **Targets**.
 
@@ -141,18 +146,18 @@ $ docker-compose ps
   * Caso o status da aplicação não esteja UP, certifique-se que a aplicação esteja rodando (Item 2.3).
   * Caso ainda não esteja UP ou com outro status, reveja a atividade, pois algum ponto pode ter faltado.
 
-5.3 Agora vamos olhar as métricas configuradas em nossa aplicação:
+6.3 Agora vamos olhar as métricas configuradas em nossa aplicação:
 
 * Métrica de Contagem de Erros (app_errors_total): Esta métrica conta o número total de erros que ocorreram em sua aplicação.
 * Métrica de Duração da Função (app_function_duration_seconds): Esta métrica mede o tempo gasto na execução de funções específicas em sua aplicação. Você configurou rótulos para identificar a função específica sendo monitorada.
 
-### Passo 6: Configurando o Grafana
+### Passo 7: Configurando o Grafana
 
-6.1. Acesse o painel Grafana em seu navegador em http://localhost:3000.
+7.1. Acesse o painel Grafana em seu navegador em http://localhost:3000.
 
-6.2. Faça login com as credenciais padrão (username: admin, password: admin).
+7.2. Faça login com as credenciais padrão (username: admin, password: admin).
 
-6.3. Configure o Prometheus como uma fonte de dados:
+7.3. Configure o Prometheus como uma fonte de dados:
 
 * Clique em "Configuration" no menu à esquerda.
 * Clique em "Data Sources" e, em seguida, em "Add data source".
@@ -160,10 +165,19 @@ $ docker-compose ps
 * Na seção "HTTP", configure o URL para http://prometheus:9090.
 * Clique em "Save & Test".
 
-### Passo 7: Criando um Painel no Grafana
+### Passo 8: Criando um Painel no Grafana
 
-6.1. Crie um novo painel clicando em "Create" e escolha "Dashboard".
+8.1. Crie um novo painel clicando em "Create" e escolha "Dashboard".
 
-6.2. Clique em "Add new panel" e escolha "Graph".
+8.2. Clique em "Add new panel" e escolha "Graph".
 
-6.3. Configure sua consulta Prometheus para visualizar métricas da sua aplicação.
+8.3. Configure sua consulta Prometheus para visualizar métricas da sua aplicação.
+
+### Passo 9: Configurando e gerando alerta com o Alertmanager.
+
+Agora é com você, configure os passos necessários para ser possível a geração de alertas utilizando o alertmanager e o webhook.
+
+
+Envie seu arquivos atualizados (docker-compose.yml, rules.yml, alertmanager.yml) para o e-mail: academy@o2b.com.br com prints do seu ambiente funcionando: Webhook disparado.
+
+**Dica:** Utilize a documentação do promethues para fazer consultas e finalizar essa etapa.
