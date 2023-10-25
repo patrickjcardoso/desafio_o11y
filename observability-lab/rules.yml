@@ -1,0 +1,6 @@
+groups:
+ - name: Error greater than 5
+   rules:
+   - alert: ErrorGreaterThan5
+     expr: app_errors_total > 5
+     for: 10s
